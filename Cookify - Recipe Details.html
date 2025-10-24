@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookify - Recipe Details</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="recipe-page fade-in">
+  <header>
+    <h2>Cookify 🍳</h2>
+  </header>
+
+
+  <main class="recipe-detail">
+    <img id="recipeHero" src="" class="hero-img" alt="Recipe">
+    <div class="recipe-text">
+      <h1 id="recipeTitle"></h1>
+      <p><strong>Ingredients:</strong></p>
+      <ul id="ingredientsList"></ul>
+      <p><strong>Try adding:</strong></p>
+      <div id="tryAdding"></div>
+      <p><strong>Instructions:</strong></p>
+      <div id="instructions"></div>
+      <p><strong>Procedure:</strong></p>
+      <ol id="procedureList"></ol>
+    </div>
+  </main>
+<!-- AOS Animation Library -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000, // animation duration
+    once: true,     // animate only once when scrolling down
+  });
+</script>
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

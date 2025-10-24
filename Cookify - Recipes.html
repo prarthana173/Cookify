@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookify - Recipes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="main-page fade-in">
+  <header class="nav-bar">
+    <h2>Cookify 🍳</h2>
+    <small style="color: #666; font-size: 12px; margin-left: 10px;">Press Ctrl+D for debug info</small>
+  </header>
+
+  <div class="filters" id="dietFilters">
+    <button class="filter-btn active" data-filter="GLOBAL">GLOBAL</button>
+    <button class="filter-btn" data-filter="VEG">VEG</button>
+    <button class="filter-btn" data-filter="NON_VEG">NON-VEG</button>
+  </div>
+
+
+  <!-- Debug Panel (hidden by default) -->
+  <div id="debugPanel" style="display: none; background: #f5f5f5; padding: 10px; margin: 10px; border-radius: 5px; font-family: monospace; font-size: 12px;">
+    <h4>Debug Information:</h4>
+    <div id="debugInfo"></div>
+    <div style="margin-top: 10px;">
+      <button onclick="testWithIngredients(['chicken', 'rice', 'onion'])">Test with: chicken, rice, onion</button>
+      <button onclick="testWithIngredients(['pasta', 'tomato', 'cheese'])">Test with: pasta, tomato, cheese</button>
+      <button onclick="clearIngredients()">Clear ingredients</button>
+    </div>
+    <button onclick="document.getElementById('debugPanel').style.display='none'">Hide Debug</button>
+  </div>
+  
+  <section>
+    <h3 style="margin: 12px 16px;">Perfect Match</h3>
+    <main class="recipe-grid" id="perfectResults"></main>
+  </section>
+
+  <section>
+    <h3 style="margin: 12px 16px;">Partial Match</h3>
+    <main class="recipe-grid" id="partialResults"></main>
+  </section>
+
+  <div id="perfectMatchModal" class="modal">
+    <div class="modal-content">
+      <h3 style="margin:0 0 10px;">PERFECT MATCH</h3>
+      <p style="margin:0 0 16px;">We found recipes that use all your ingredients.</p>
+      <button id="closePerfect" class="add-btn">OK</button>
+    </div>
+  </div>
+
+<!-- AOS Animation Library -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000, // animation duration
+    once: true,     // animate only once when scrolling down
+  });
+</script>
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

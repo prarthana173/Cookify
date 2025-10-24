@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookify - Ingredients</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="ingredients-page fade-in">
+  <header>
+    <h1>What’s in your kitchen today? 🥕🍅</h1>
+  </header>
+
+  <main>
+    <div class="input-section">
+      <input id="ingredientInput" type="text" placeholder="Enter ingredients (comma separated): ">
+      <button onclick="goToMain()">Find Recipes</button>
+      <div id="ingredientError" style="margin-top:8px;color:#e53935;font-size:0.95rem;display:none;"></div>
+    </div>
+  </main>
+
+  <!-- Popup container for toffee suggestions -->
+  <div class="popup-container" id="popupContainer"></div>
+
+  <script>
+    function goToMain() {
+      const input = document.getElementById('ingredientInput');
+      const error = document.getElementById('ingredientError');
+      const raw = (input.value || '');
+      const ingredients = raw.split(',').map(s => s.trim()).filter(Boolean);
+
+      if (ingredients.length === 0) {
+        error.textContent = 'Please enter at least one ingredient, separated by commas.';
+        error.style.display = 'block';
+        input.setAttribute('aria-invalid', 'true');
+        input.focus();
+        return;
+      }
+
+      error.style.display = 'none';
+      input.removeAttribute('aria-invalid');
+
+      try { localStorage.setItem('cookify_ingredients', JSON.stringify(ingredients)); } catch (_) {}
+      document.body.classList.remove('fade-in');
+      setTimeout(() => { window.location.href = 'Cookify - Recipes.html'; }, 500);
+    }
+
+    // Toffee popup suggestions system
+    const dishSuggestions = [
+      "Would you like to try a milkshake? 🥤",
+      "How about something sweet? 🍰",
+      "Craving a smoothie bowl? 🍓",
+      "Time for some cookies? 🍪",
+      "Want to make pancakes? 🥞",
+      "How about a fruit salad? 🍎",
+      "Feeling like ice cream? 🍦",
+      "Try a chocolate cake? 🎂",
+      "Make some fresh juice? 🍊",
+      "Want some pasta today? 🍝",
+      "How about a sandwich? 🥪",
+      "Craving pizza tonight? 🍕",
+      "Time for soup? 🍲",
+      "Want to bake bread? 🍞",
+      "How about a salad? 🥗"
+    ];
+
+    const pastelTypes = ['pastel-pink', 'pastel-blue', 'pastel-green', 'pastel-yellow', 'pastel-purple'];
+    let activePopups = [];
+    let popupInterval;
+
+    // Enhanced positioning system with proper stacking and no overlap
+    const popupStacks = {
+      leftSide: [],
+      rightSide: []
+    };
+
+    function getNextStackPosition() {
+      const margin = 60; // Further increased margin for better separation
+      const popupWidth = 200;
+      const popupHeight = 80;
+      const stackGap = 45; // Further increased gap to ensure no overlap
+      
+      // Get header dimensions to avoid overlap
+      const header = document.querySelector('header h1');
+      const headerRect = header ? header.getBoundingClientRect() : null;
+      const headerBottom = headerRect ? headerRect.bottom + margin : margin;
+      
+      // Get input section dimensions to avoid overlap
+      const inputSection = document.querySelector('.input-section');
+      const inputRect = inputSection ? inputSection.getBoundingClientRect() : null;
+      const inputTop = inputRect ? inputRect.top - margin * 2 : window.innerHeight - margin * 3; // More space above input
+      
+      // Calculate available vertical space for popups
+      const availableHeight = inputTop - headerBottom;
+      const maxStackHeight = Math.floor(availableHeight / (popupHeight + stackGap));
+      
+      // Determine which side to use (alternate between left and right)
+      const leftCount = popupStacks.leftSide.length;
+      const rightCount = popupStacks.rightSide.length;
+      
+      let side, stackIndex, baseX;
+      
+      if (leftCount <= rightCount) {
+        side = 'leftSide';
+        stackIndex = leftCount;
+        baseX = margin;
+      } else {
+        side = 'rightSide';
+        stackIndex = rightCount;
+        baseX = window.innerWidth - popupWidth - margin;
+      }
+      
+      // If stack is getting too tall, start a new column
+      if (stackIndex >= maxStackHeight) {
+        // Create additional columns with offset
+        const columnOffset = Math.floor(stackIndex / maxStackHeight);
+        stackIndex = stackIndex % maxStackHeight;
+        
+        if (side === 'leftSide') {
+          baseX = margin + (columnOffset * (popupWidth + 30)); // More space between columns
+        } else {
+          baseX = window.innerWidth - popupWidth - margin - (columnOffset * (popupWidth + 30)); // More space between columns
+        }
+      }
+      
+      // Calculate Y position with proper stacking
+      const y = headerBottom + (stackIndex * (popupHeight + stackGap));
+      
+      // Ensure popup doesn't go below input section with extra buffer
+      const finalY = Math.min(y, inputTop - popupHeight - 20); // Increased buffer
+      
+      return { x: baseX, y: finalY, side: side };
+    }
+
+    function repositionStack(side) {
+      const margin = 60; // Match the updated margin
+      const popupWidth = 200;
+      const popupHeight = 80;
+      const stackGap = 45; // Match the updated stack gap
+      
+      // Get header dimensions
+      const header = document.querySelector('header h1');
+      const headerRect = header ? header.getBoundingClientRect() : null;
+      const headerBottom = headerRect ? headerRect.bottom + margin : margin;
+      
+      // Get input section dimensions
+      const inputSection = document.querySelector('.input-section');
+      const inputRect = inputSection ? inputSection.getBoundingClientRect() : null;
+      const inputTop = inputRect ? inputRect.top - margin * 2 : window.innerHeight - margin * 3; // Match main function spacing
+      
+      const availableHeight = inputTop - headerBottom;
+      const maxStackHeight = Math.floor(availableHeight / (popupHeight + stackGap));
+      
+      // Reposition all popups in the specified stack
+      popupStacks[side].forEach((popup, index) => {
+        let baseX;
+        let stackIndex = index;
+        
+        // Calculate base X position
+        if (side === 'leftSide') {
+          const columnOffset = Math.floor(index / maxStackHeight);
+          baseX = margin + (columnOffset * (popupWidth + 30)); // Match main function spacing
+          stackIndex = index % maxStackHeight;
+        } else {
+          const columnOffset = Math.floor(index / maxStackHeight);
+          baseX = window.innerWidth - popupWidth - margin - (columnOffset * (popupWidth + 30)); // Match main function spacing
+          stackIndex = index % maxStackHeight;
+        }
+        
+        // Calculate Y position
+        const y = headerBottom + (stackIndex * (popupHeight + stackGap));
+        const finalY = Math.min(y, inputTop - popupHeight - 20); // Match main function buffer
+        
+        // Apply new position with smooth transition
+        popup.style.transition = 'all 0.3s ease';
+        popup.style.left = baseX + 'px';
+        popup.style.top = finalY + 'px';
+        
+        // Remove transition after animation completes
+        setTimeout(() => {
+          popup.style.transition = '';
+        }, 300);
+      });
+    }
+
+    function createToffeePopup() {
+      const container = document.getElementById('popupContainer');
+      if (!container || activePopups.length >= 10) return;
+
+      const popup = document.createElement('div');
+      const suggestion = dishSuggestions[Math.floor(Math.random() * dishSuggestions.length)];
+      const pastelType = pastelTypes[Math.floor(Math.random() * pastelTypes.length)];
+      
+      popup.className = `toffee-popup ${pastelType}`;
+      popup.textContent = suggestion;
+      
+      // Get stack position
+      const position = getNextStackPosition();
+      
+      popup.style.left = position.x + 'px';
+      popup.style.top = position.y + 'px';
+      
+      // Store popup in stack tracking
+      if (position.side) {
+        popupStacks[position.side].push(popup);
+      }
+      
+      container.appendChild(popup);
+      activePopups.push(popup);
+      
+      // Show popup with animation
+      setTimeout(() => {
+        popup.classList.add('show', 'floating');
+      }, 100);
+      
+      // Auto dismiss after 10 seconds
+      const dismissTime = 10000; // 10 seconds
+      setTimeout(() => {
+        dismissPopup(popup);
+      }, dismissTime);
+      
+      // Click to dismiss
+      popup.addEventListener('click', () => {
+        dismissPopup(popup);
+      });
+    }
+
+    function dismissPopup(popup) {
+      if (!popup) return;
+      
+      // Remove from activePopups array immediately
+      activePopups = activePopups.filter(p => p !== popup);
+      
+      // Remove from stack tracking and reposition remaining popups
+      for (const side in popupStacks) {
+        const index = popupStacks[side].indexOf(popup);
+        if (index !== -1) {
+          popupStacks[side].splice(index, 1);
+          // Reposition remaining popups in this stack to fill the gap
+          repositionStack(side);
+          break;
+        }
+      }
+      
+      if (!popup.parentNode) return;
+      
+      popup.classList.remove('show', 'floating');
+      popup.classList.add('hide');
+      
+      setTimeout(() => {
+        if (popup.parentNode) {
+          popup.parentNode.removeChild(popup);
+        }
+      }, 600);
+    }
+
+    function startPopupSystem() {
+      // Create initial burst of more popups quickly
+      setTimeout(createToffeePopup, 100);   // First popup after 0.1 seconds
+      setTimeout(createToffeePopup, 250);   // Second popup after 0.25 seconds
+      setTimeout(createToffeePopup, 400);   // Third popup after 0.4 seconds
+      setTimeout(createToffeePopup, 600);   // Fourth popup after 0.6 seconds
+      setTimeout(createToffeePopup, 800);   // Fifth popup after 0.8 seconds
+      setTimeout(createToffeePopup, 1000);  // Sixth popup after 1 second
+      setTimeout(createToffeePopup, 1200);  // Seventh popup after 1.2 seconds
+      
+      // Create new popups every 1.5-2.5 seconds to maintain 8-10 active popups
+      popupInterval = setInterval(() => {
+        if (Math.random() > 0.15) { // 85% chance to create popup
+          createToffeePopup();
+        }
+      }, Math.random() * 1000 + 1500);
+    }
+
+    function stopPopupSystem() {
+      if (popupInterval) {
+        clearInterval(popupInterval);
+      }
+      // Dismiss all active popups
+      activePopups.forEach(dismissPopup);
+      
+      // Clear stack tracking
+      for (const side in popupStacks) {
+        popupStacks[side] = [];
+      }
+    }
+
+    // Start the popup system when page loads
+    window.addEventListener('load', () => {
+      setTimeout(startPopupSystem, 100); // Start after just 0.1 seconds
+    });
+
+    // Stop popups when user starts typing
+    document.getElementById('ingredientInput').addEventListener('focus', () => {
+      stopPopupSystem();
+    });
+
+    // Restart popups when input loses focus (if empty)
+    document.getElementById('ingredientInput').addEventListener('blur', (e) => {
+      if (!e.target.value.trim()) {
+        setTimeout(startPopupSystem, 500); // Restart quickly after 0.5 seconds
+      }
+    });
+
+    // Handle window resize to reposition popups
+    window.addEventListener('resize', () => {
+      // Reposition all existing popups
+      repositionStack('leftSide');
+      repositionStack('rightSide');
+    });
+  </script>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

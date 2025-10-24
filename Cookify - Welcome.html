@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookify - Welcome</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="welcome-page fade-in">
+  <div class="hero">
+    <div class="overlay">
+      <div class="welcome-content">
+        <h1>Welcome to <span>Cookify</span></h1>
+        <div class="slogan">
+          <p>From fridge finds to fine dining.</p>
+          <p>Discover what your kitchen's been hiding.</p>
+        </div>
+        <a href="Cookify - Ingredients.html" class="explore-btn">
+          <span>Start Exploring</span>
+          <span class="btn-icon">🍳</span>
+        </a>
+      </div>
+      
+      <!-- Featured Recipes Section -->
+      <div class="featured-recipes" data-aos="fade-up" data-aos-delay="100">
+        <h3>Popular Recipes</h3>
+        <div class="recipe-icons">
+          <div class="recipe-icon" data-aos="zoom-in" data-aos-delay="150">
+            <div class="icon-circle">🍕</div>
+            <span>Pizza</span>
+          </div>
+          <div class="recipe-icon" data-aos="zoom-in" data-aos-delay="200">
+            <div class="icon-circle">🍝</div>
+            <span>Pasta</span>
+          </div>
+          <div class="recipe-icon" data-aos="zoom-in" data-aos-delay="250">
+            <div class="icon-circle">🥞</div>
+            <span>Pancakes</span>
+          </div>
+          <div class="recipe-icon" data-aos="zoom-in" data-aos-delay="300">
+            <div class="icon-circle">🥤</div>
+            <span>Milkshake</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- AOS Animation Library -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1000, // animation duration
+    once: true,     // animate only once when scrolling down
+  });
+</script>
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

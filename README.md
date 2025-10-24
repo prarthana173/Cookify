@@ -1,5 +1,3 @@
-# Cookify
-CSI project codes
 # Cookify - Recipe Discovery App with Flask Authentication
 
 A modern web application for discovering recipes based on available ingredients, now with secure Flask backend authentication.
